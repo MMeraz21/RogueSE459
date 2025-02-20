@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import com.group2.rogue.monsters.Monster;
+
 public class RogueLevel {
     private static final int levelWidth = 80;
     private static final int levelHeight = 24;
@@ -30,10 +32,12 @@ public class RogueLevel {
     private final List<int[]> roomCenters = new ArrayList<>();
 
     private final boolean[][] connected = new boolean[9][9]; // needed so that we dont get floating rooms  CHANGED
+     private final List<Monster> monsters = new ArrayList<>();
 
 
     public RogueLevel() {
         generateLevel();
+        placeMonsters();
     }
 
     public void generateLevel() {
@@ -252,6 +256,23 @@ public class RogueLevel {
         for (char[] row : level) {
             System.out.println(new String(row));
         }
+    }
+
+    private void placeMonsters() {
+        int monsterCount = random.nextInt(5) + 3;
+        for (int i = 0; i < monsterCount; i++) {
+            int x, y;
+            do {
+                x = random.nextInt(levelWidth);
+                y = random.nextInt(levelHeight);
+            } while (level[y][x] != FLOOR);
+            
+            monsters.add(Monster.generateRandomMonster(x, y));
+        }
+    }
+
+    public List<Monster> getMonsters() {
+        return monsters;
     }
 
 }

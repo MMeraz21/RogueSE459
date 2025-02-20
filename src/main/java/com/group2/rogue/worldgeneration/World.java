@@ -7,6 +7,7 @@ import java.util.Scanner;
 
 import org.jline.utils.NonBlockingReader;
 
+import com.group2.rogue.monsters.Monster;
 import com.group2.rogue.player.Player;
 
 public class World {
@@ -95,19 +96,33 @@ public class World {
 
     public void displayWorld() {
         char[][] map = currLevel.getMap();
+        List<Monster> monsters = currLevel.getMonsters();
         int playerX = player.getX();
         int playerY = player.getY();
-
+    
         for (int y = 0; y < map.length; y++) {
             for (int x = 0; x < map[y].length; x++) {
-                if (x == playerX && y == playerY) {
-                    System.out.print('@'); // Player icon
-                } else {
-                    System.out.print(map[y][x]);
+                boolean isMonster = false;
+                for (Monster monster : monsters) {
+                    if (monster.getX() == x && monster.getY() == y) {
+                        System.out.print(monster.getSymbol());
+                        isMonster = true;
+                        break;
+                    }
+                }
+                if (!isMonster) {
+                    if (x == playerX && y == playerY) {
+                        System.out.print('@'); // Player icon
+                    } else {
+                        System.out.print(map[y][x]);
+                    }
                 }
             }
             System.out.println();
         }
+    
+        // Print player stats at the end
         System.out.println(player.getStats());
     }
+    
 }
