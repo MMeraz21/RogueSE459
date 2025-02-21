@@ -16,9 +16,9 @@ public class World {
     private Player player;
 
     public void generateWorld() {
-        levels = new ArrayList<>();   //world has 9 levels
+        levels = new ArrayList<>();   // world has 9 levels
         for (int i = 0; i < 9; i++) {
-            levels.add(new RogueLevel());
+            levels.add(new RogueLevel(i + 1)); // Pass level index starting from 1
         }
         currLevel = levels.get(0);
     }

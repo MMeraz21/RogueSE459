@@ -13,7 +13,7 @@ public class PlayerTest {
 
     @BeforeEach
     void setUp() {
-        dungeon = new RogueLevel();
+        dungeon = new RogueLevel(0);
         player = new Player(dungeon);
         map = dungeon.getMap();
     }

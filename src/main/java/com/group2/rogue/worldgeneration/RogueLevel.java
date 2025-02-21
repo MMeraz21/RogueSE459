@@ -34,8 +34,11 @@ public class RogueLevel {
     private final boolean[][] connected = new boolean[9][9]; // needed so that we dont get floating rooms  CHANGED
      private final List<Monster> monsters = new ArrayList<>();
 
+     private int levelIndex;
 
-    public RogueLevel() {
+
+     public RogueLevel(int levelIndex) {
+        this.levelIndex = levelIndex;
         generateLevel();
         placeMonsters();
     }
@@ -267,9 +270,11 @@ public class RogueLevel {
                 y = random.nextInt(levelHeight);
             } while (level[y][x] != FLOOR);
             
-            monsters.add(Monster.generateRandomMonster(x, y));
+            // Spawn monsters according to their levels
+            monsters.add(Monster.generateRandomMonster(x, y, this.levelIndex));
         }
     }
+    
 
     public List<Monster> getMonsters() {
         return monsters;

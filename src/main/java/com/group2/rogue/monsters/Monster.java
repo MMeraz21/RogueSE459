@@ -1,6 +1,8 @@
 package com.group2.rogue.monsters;
 
 import java.util.Random;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Monster {
     private char symbol;
@@ -34,16 +36,11 @@ public class Monster {
         this.y = y;
     }
 
-    public static Monster generateRandomMonster(int x, int y) {
-        char[] symbols = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'};
-        String[] names = {"Aquator", "Bat", "Centaur", "Dragon", "Emu", "Flytrap", "Griffon", "Hobgoblin", "Ice Monster", "Jabberwock",
-                "Kestral", "Leprechaun", "Medusa", "Nymph", "Orc", "Phantom", "Quagga", "Rattlesnake", "Snake", "Troll",
-                "Ur-vile", "Vampire", "Wraith", "Xeroc", "Yeti", "Zombie"};
-        int index = random.nextInt(symbols.length);
-
-        return new Monster(symbols[index], names[index], random.nextInt(10) + 1, random.nextInt(10),
-                (random.nextInt(8) + 1) * (random.nextInt(3) + 1), random.nextInt(200),
-                random.nextBoolean(), random.nextBoolean(), random.nextBoolean(), random.nextBoolean(), random.nextBoolean(), x, y);
+    public static Monster generateRandomMonster(int x, int y, int dungeonLevel) {
+        MonsterAttributes attributes = MonsterAttributes.getRandomMonster(dungeonLevel);
+        return new Monster(attributes.getSymbol(), attributes.getName(), attributes.getLevel(), attributes.getArmor(),
+                attributes.getHealth(), attributes.getExperience(), attributes.isMean(), attributes.isFlying(),
+                attributes.isRegenerating(), attributes.isInvisible(), attributes.isGreedy(), x, y);
     }
 
     public char getSymbol() {
