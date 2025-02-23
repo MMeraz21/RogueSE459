@@ -16,6 +16,8 @@ public class Monster {
     private boolean isRegenerating;
     private boolean isInvisible;
     private boolean isGreedy;
+    private int minDamage;
+    private int maxDamage;
     private int x, y;
     private static final Random random = new Random();
 
