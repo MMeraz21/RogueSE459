@@ -98,4 +98,17 @@ public class Player {
 
     public int getX() { return x; }
     public int getY() { return y; }
+
+    public void takeDamage(int damage) {
+        hits = Math.max(0, hits - damage);
+    }
+    
+    public void addExperience(int exp) {
+        experience += exp;
+        // add level up logic
+    }
+    
+    public int getHits() {
+        return hits;
+    }
 }

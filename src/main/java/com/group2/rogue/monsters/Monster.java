@@ -56,4 +56,28 @@ public class Monster {
     public int getY() {
         return y;
     }
+
+    public void takeDamage(int damage) {
+        health = Math.max(0, health - damage);
+    }
+    
+    public int getHealth() {
+        return health;
+    }
+    
+    public String getName() {
+        return name;
+    }
+    
+    public boolean isMean() {
+        return isMean;
+    }
+    
+    public int getMinDamage() {
+        return minDamage;
+    }
+    
+    public int getMaxDamage() {
+        return maxDamage;
+    }
 }

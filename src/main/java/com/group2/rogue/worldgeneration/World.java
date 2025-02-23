@@ -91,6 +91,30 @@ public class World {
             return false; // so that player doesnt move when theres an error
         }
     }
+
+    // public void checkForCombat() {
+    //     List<Monster> monsters = currLevel.getMonsters();
+    //     int playerX = player.getX();
+    //     int playerY = player.getY();
+    
+    //     for (Monster monster : monsters) {
+    //         if (Math.abs(playerX - monster.getX()) <= 1 && Math.abs(playerY - monster.getY()) <= 1) {
+    //             // A monster is adjacent or on the same tile as the player
+    //             startCombat(monster);
+    //             return;  // Combat has started, so no need to check further monsters
+    //         }
+    //     }
+    // }
+
+    public void startCombat(Monster monster) {
+        boolean isCombatActive = true;
+
+        while(isCombatActive) {
+            if(!monster.isMean()){
+
+            }
+        }
+    }
     
 
 

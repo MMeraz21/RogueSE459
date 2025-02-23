@@ -280,4 +280,8 @@ public class RogueLevel {
         return monsters;
     }
 
+    public void removeMonster(Monster monster) {
+        monsters.remove(monster);
+    }
+
 }
