@@ -16,6 +16,8 @@ public class Monster {
     private boolean isRegenerating;
     private boolean isInvisible;
     private boolean isGreedy;
+    private int minDamage;
+    private int maxDamage;
     private int x, y;
     private static final Random random = new Random();
 
@@ -53,5 +55,41 @@ public class Monster {
 
     public int getY() {
         return y;
+    }
+
+    public void takeDamage(int damage) {
+        health = Math.max(0, health - damage);
+    }
+    
+    public int getHealth() {
+        return health;
+    }
+    
+    public String getName() {
+        return name;
+    }
+    
+    public boolean isMean() {
+        return isMean;
+    }
+    
+    public int getMinDamage() {
+        return minDamage;
+    }
+    
+    public int getMaxDamage() {
+        return maxDamage;
+    }
+
+    public int getLevel() {
+        return level;
+    }
+
+    public int getArmor() {
+        return armor;
+    }
+
+    public int getExperience() {
+        return experience;
     }
 }
