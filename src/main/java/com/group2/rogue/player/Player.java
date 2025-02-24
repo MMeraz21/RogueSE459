@@ -23,6 +23,7 @@ public class Player {
     private int gold = 0;
     private int armor = 5; 
     private int experience = 0;
+    private int experienceToNextLevel = 10; 
 
     public Player(RogueLevel dungeon) {
         this.dungeonMap = dungeon.getMap();
@@ -106,6 +107,14 @@ public class Player {
     public void addExperience(int exp) {
         experience += exp;
         // add level up logic
+        while (experience >= experienceToNextLevel) {
+            levelUp();
+        }
+    }
+
+    private void levelUp() {
+        playerLevel++;
+        experienceToNextLevel *= 2;
     }
     
     public int getHits() {

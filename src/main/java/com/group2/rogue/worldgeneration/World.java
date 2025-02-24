@@ -188,7 +188,7 @@ public class World {
     }
 
     private void playerAttack(Monster monster) {
-        int roll = rollDice(1, 20);
+        int roll = rollDice(10, 20);  //changed min for pres
         int strengthMod = calculateStrengthAttackModifier(player.getStrength());
         int totalRoll = roll + player.getPlayerLevel() + strengthMod;
         
@@ -197,7 +197,7 @@ public class World {
         
         if (totalRoll >= toHit) {  // successful hit
             int damageBonus = calculateStrengthDamageModifier(player.getStrength());
-            int damage = Math.max(1, damageBonus + rollDice(1, 4)); // we haven't added weapons yet
+            int damage = Math.max(1, damageBonus + rollDice(8, 10)); // we haven't added weapons yet, MAKE SURE TO CHANGE THIS, THIS IS FOR DEMO PURPOSES
             monster.takeDamage(damage);
             // System.out.println("You hit the " + monster.getName() + " for " + damage + " damage!");
             String message = "You hit the " + monster.getName() + " for " + damage + " damage!";
