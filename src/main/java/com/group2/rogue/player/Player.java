@@ -111,4 +111,16 @@ public class Player {
     public int getHits() {
         return hits;
     }
+
+    public int getPlayerLevel() {
+        return playerLevel;
+    }
+
+    public int getStrength() {
+        return strength;
+    }
+
+    public int getArmor() {
+        return armor;
+    }
 }

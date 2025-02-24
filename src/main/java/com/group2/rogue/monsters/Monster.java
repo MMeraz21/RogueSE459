@@ -80,4 +80,16 @@ public class Monster {
     public int getMaxDamage() {
         return maxDamage;
     }
+
+    public int getLevel() {
+        return level;
+    }
+
+    public int getArmor() {
+        return armor;
+    }
+
+    public int getExperience() {
+        return experience;
+    }
 }
