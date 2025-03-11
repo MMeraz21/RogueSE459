@@ -3,11 +3,17 @@ package com.group2.rogue.worldgeneration;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Scanner;
 
 import org.jline.utils.NonBlockingReader;
 
+import com.group2.rogue.items.Armor;
+import com.group2.rogue.items.Food;
+import com.group2.rogue.items.Gold;
+import com.group2.rogue.items.Item;
+import com.group2.rogue.items.Weapon;
 import com.group2.rogue.monsters.Monster;
 import com.group2.rogue.player.Player;
 
@@ -45,21 +51,28 @@ public class World {
             case 'D': attemptedX++; break;
         }
     
-        Monster monster = getMonsterAt(attemptedX, attemptedY);   //checks if there is a monster at the attempted location
+        // Check for monsters
+        Monster monster = getMonsterAt(attemptedX, attemptedY);
         if (monster != null) {
-            // System.out.println("STARTING COMBAT");
             initiateCombat(reader, monster);
-            return; // dont move!
+            return;
         }
     
-        // no monster, can proceed normally
-        player.movePlayer(direction);
+        // Check for items
+        Item item = currLevel.getItemAt(attemptedX, attemptedY);
+        if (item != null) {
+            player.pickUpItem(item);
+            currLevel.removeItem(attemptedX, attemptedY);
+            messages.add("You picked up: " + item);
+        }
     
-        int newX = player.getX();
-        int newY = player.getY();
-
+        // Move the player
+        if (isWalkable(attemptedX, attemptedY)) {
+            player.movePlayer(direction);
+        }
+    
+        // Check for stairs
         char tile = currLevel.getMap()[player.getY()][player.getX()];
-    
         if (tile == '>') {
             if (promptMove(reader, "Are you sure you want to go down to the next level? (y/n): ")) {
                 moveToNextLevel();
@@ -69,6 +82,10 @@ public class World {
                 moveToPreviousLevel();
             }
         }
+    }
+
+    private boolean isWalkable(int x, int y) {
+        return player.isWalkable(x, y);
     }
     
 
@@ -269,14 +286,15 @@ public class World {
     public void displayWorld() {
         char[][] map = currLevel.getMap();
         List<Monster> monsters = currLevel.getMonsters();
+        Map<Position, Item> items = currLevel.getItems(); // Use Position as keys
         int playerX = player.getX();
         int playerY = player.getY();
     
         for (String message : messages) {
             System.out.println(message);
         }
-        clearMessages(); 
-
+        clearMessages();
+    
         for (int y = 0; y < map.length; y++) {
             for (int x = 0; x < map[y].length; x++) {
                 boolean isMonster = false;
@@ -287,11 +305,24 @@ public class World {
                         break;
                     }
                 }
+    
                 if (!isMonster) {
-                    if (x == playerX && y == playerY) {
-                        System.out.print('@'); // Player icon
+                    // Check if there's an item at this position
+                    Item item = currLevel.getItemAt(x, y);
+                    if (item != null) {
+                        if (item instanceof Food) {
+                            System.out.print('F'); // Food
+                        } else if (item instanceof Weapon) {
+                            System.out.print('W'); // Weapon
+                        } else if (item instanceof Armor) {
+                            System.out.print('A'); // Armor
+                        } else if (item instanceof Gold) {
+                            System.out.print('G'); // Gold
+                        }
+                    } else if (x == playerX && y == playerY) {
+                        System.out.print('@'); // Player
                     } else {
-                        System.out.print(map[y][x]);
+                        System.out.print(map[y][x]); // Default map tile
                     }
                 }
             }
@@ -301,5 +332,4 @@ public class World {
         // Print player stats at the end
         System.out.println(player.getStats());
     }
-    
 }

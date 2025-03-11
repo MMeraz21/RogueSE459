@@ -1,10 +1,13 @@
 package com.group2.rogue.worldgeneration;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import com.group2.rogue.monsters.Monster;
+import com.group2.rogue.items.*;
 
 public class RogueLevel {
     private static final int levelWidth = 80;
@@ -15,7 +18,6 @@ public class RogueLevel {
     private static final char HALLWAY = '+';
     private static final char STAIRS_UP = '%';
     private static final char STAIRS_DOWN = '>';
-
 
     private static final int MAX_ROOMS = 8;
     private static final int MIN_ROOM_SIZE = 3;
@@ -31,13 +33,14 @@ public class RogueLevel {
     private final int[][] centers = new int[9][2];
     private final List<int[]> roomCenters = new ArrayList<>();
 
-    private final boolean[][] connected = new boolean[9][9]; // needed so that we dont get floating rooms  CHANGED
-     private final List<Monster> monsters = new ArrayList<>();
+    private final boolean[][] connected = new boolean[9][9]; // needed so that we don't get floating rooms
+    private final List<Monster> monsters = new ArrayList<>();
+    
+    private final Map<Position, Item> items = new HashMap<>();
 
-     private int levelIndex;
+    private int levelIndex;
 
-
-     public RogueLevel(int levelIndex) {
+    public RogueLevel(int levelIndex) {
         this.levelIndex = levelIndex;
         generateLevel();
         placeMonsters();
@@ -49,6 +52,7 @@ public class RogueLevel {
         connectRooms();
         ensureAllRoomsConnected();
         placeStairs();
+        placeItems(); // Add this line to place items in the dungeon
     }
 
     public char[][] getMap() {
@@ -83,7 +87,6 @@ public class RogueLevel {
         for (int row = 0; row < GRID_ROWS; row++) {
             for (int col = 0; col < GRID_COLS; col++) {
                 if (random.nextDouble() < 0.90) {  // 90% chance to place a room
-
                     int sectionStartX = col * sectionWidth;  //get the bounds
                     int sectionStartY = row * sectionHeight;
 
@@ -133,9 +136,7 @@ public class RogueLevel {
         centers[roomIndex][1] = startY + height / 2;
     }
 
-
     private void connectRooms() {
-
         boolean[][] isConnected = new boolean[GRID_ROWS][GRID_COLS];
 
         for (int row = 0; row < GRID_ROWS; row++) {   //horizontal connections
@@ -210,8 +211,6 @@ public class RogueLevel {
                 }
             }
         }
-
-
     }
 
     private void ensureAllRoomsConnected() {
@@ -236,7 +235,6 @@ public class RogueLevel {
         for (int attempts = 0; attempts < 100; attempts++) {   //100 tries to place both types of stairs, works good enough
             int x = random.nextInt(levelWidth);
             int y = random.nextInt(levelHeight);
-            
 
             if (level[y][x] == FLOOR) {
                 level[y][x] = STAIRS_UP;
@@ -255,12 +253,6 @@ public class RogueLevel {
         }
     }
 
-    public void printLevel() {
-        for (char[] row : level) {
-            System.out.println(new String(row));
-        }
-    }
-
     private void placeMonsters() {
         int monsterCount = random.nextInt(5) + 3;
         for (int i = 0; i < monsterCount; i++) {
@@ -274,7 +266,42 @@ public class RogueLevel {
             monsters.add(Monster.generateRandomMonster(x, y, this.levelIndex));
         }
     }
-    
+
+    private void placeItems() {
+        // Place gold in rooms (1 in 3 chance)
+        for (int[] center : roomCenters) {
+            if (random.nextInt(3) == 0) { // 1 in 3 chance
+                int x = center[0];
+                int y = center[1];
+                Gold gold = ItemGenerator.generateGold(levelIndex);
+                items.put(new Position(x, y), gold); // Use Position as key
+            }
+        }
+
+        // Place weapons, armor, and food in rooms
+        for (int[] center : roomCenters) {
+            if (random.nextInt(5) == 0) { // 1 in 5 chance for an item
+                int x = center[0];
+                int y = center[1];
+                int itemType = random.nextInt(3); // 0: Weapon, 1: Armor, 2: Food
+                switch (itemType) {
+                    case 0:
+                        Weapon weapon = ItemGenerator.generateWeapon();
+                        items.put(new Position(x, y), weapon); // Use Position as key
+                        break;
+                    case 1:
+                        Armor armor = ItemGenerator.generateArmor();
+                        items.put(new Position(x, y), armor); // Use Position as key
+                        break;
+                    case 2:
+                        Food food = ItemGenerator.generateFood();
+                        items.put(new Position(x, y), food); // Use Position as key
+                        break;
+                }
+            }
+        }
+    }
+
 
     public List<Monster> getMonsters() {
         return monsters;
@@ -284,4 +311,15 @@ public class RogueLevel {
         monsters.remove(monster);
     }
 
+    public Item getItemAt(int x, int y) {
+        return items.get(new Position(x, y)); // Use Position as key
+    }
+
+    public void removeItem(int x, int y) {
+        items.remove(new Position(x, y)); // Use Position as key
+    }
+
+    public Map<Position, Item> getItems() {
+        return items;
+    }
 }
