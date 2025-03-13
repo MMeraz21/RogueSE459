@@ -1,7 +1,9 @@
 package com.group2.rogue.player;
 
 import com.group2.rogue.items.Item;
+import com.group2.rogue.items.Weapon;
 import com.group2.rogue.worldgeneration.RogueLevel;
+import com.group2.rogue.items.Armor;
 import com.group2.rogue.items.Food;
 
 import java.util.ArrayList;
@@ -24,6 +26,9 @@ public class Player {
     private int experience = 0;
     private int experienceToNextLevel = 10;
 
+    private Weapon weapon;
+    private Armor equippedArmor;
+
     // private int foodSupply = 10;
     private boolean isFainted = false;
     private int faintTurnsLeft = 0;
@@ -45,6 +50,15 @@ public class Player {
 
     private void initializeInventory() {
         inventory.add(new Food("Ration", 1000));
+
+        Armor startingArmor = new Armor("Leather", 8);
+        inventory.add(startingArmor);
+        equippedArmor = startingArmor;
+
+        Weapon startingWeapon = new Weapon("Mace", 2, 4, false, null);
+        inventory.add(startingWeapon);
+        weapon = startingWeapon;
+        
     }
 
 
@@ -116,11 +130,11 @@ public class Player {
     }
 
     public int getStrength() {
-        return strength;
+        return strength + weapon.getDamage();
     }
 
     public int getArmor() {
-        return armor;
+        return armor + equippedArmor.getArmorClass();
     }
 
     public void setLevel(RogueLevel dungeon) {
