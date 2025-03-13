@@ -35,9 +35,12 @@ public class App {
                     break;
                 } else if (key == 'E') {
                     world.getPlayer().eatFood();
-                }else{
+                } else if (key == 'R') {
+                    world.getPlayer().cycleWeapons();
+                } else if (key == 'T') {
+                    world.getPlayer().cycleArmor();
+                } else {
                     world.movePlayer(reader, key);
-
                 }
 
                 //world.movePlayer(reader, key);

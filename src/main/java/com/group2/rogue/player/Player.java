@@ -189,4 +189,52 @@ public class Player {
         return isFainted;
     }
 
+    public void cycleWeapons() {
+        List<Weapon> weapons = new ArrayList<>();
+        for (Item item : inventory) {
+            if (item instanceof Weapon) {
+                weapons.add((Weapon) item);
+            }
+        }
+
+        if(weapons.isEmpty()) {
+            System.out.println("You have no weapons to equip.");
+            return;
+        }
+
+        //Find current weapon index
+        int currentWeaponIndex = weapons.indexOf(weapon);
+        int nextWeaponIndex = (currentWeaponIndex + 1) % weapons.size();
+        weapon = weapons.get(nextWeaponIndex);
+        System.out.println("You equipped: " + weapon);
+    }
+
+    public void cycleArmor() {
+        List<Armor> armors = new ArrayList<>();
+        for (Item item : inventory) {
+            if (item instanceof Armor) {
+                armors.add((Armor) item);
+            }
+        }
+
+        if(armors.isEmpty()) {
+            System.out.println("You have no armor to equip.");
+            return;
+        }
+
+        //Find current armor index
+        int currentArmorIndex = armors.indexOf(equippedArmor);
+        int nextArmorIndex = (currentArmorIndex + 1) % armors.size();
+        equippedArmor = armors.get(nextArmorIndex);
+        System.out.println("You equipped: " + equippedArmor);
+    }
+
+    public Weapon getWeapon() {
+        return weapon;
+    }
+
+    public Armor getEquippedArmor() {
+        return equippedArmor;
+    }
+
 }
