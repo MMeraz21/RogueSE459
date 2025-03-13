@@ -2,6 +2,7 @@ package com.group2.rogue.player;
 
 import com.group2.rogue.items.Item;
 import com.group2.rogue.worldgeneration.RogueLevel;
+import com.group2.rogue.items.Food;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,11 +24,16 @@ public class Player {
     private int experience = 0;
     private int experienceToNextLevel = 10;
 
+    // private int foodSupply = 10;
+    private boolean isFainted = false;
+    private int faintTurnsLeft = 0;
+
     // Player inventory
     private List<Item> inventory = new ArrayList<>();
     private static final int MAX_INVENTORY_SIZE = 23;
 
     public Player(RogueLevel dungeon) {
+        initializeInventory();
         this.dungeonMap = dungeon.getMap();
         int[] startingRoom = dungeon.getStartingRoom();
 
@@ -36,6 +42,11 @@ public class Player {
             this.y = startingRoom[1];
         }
     }
+
+    private void initializeInventory() {
+        inventory.add(new Food("Ration", 1000));
+    }
+
 
     public void movePlayer(char direction) {
         int newX = x, newY = y;
@@ -132,4 +143,36 @@ public class Player {
     public int levelIndexUp() {
         return level++;
     }
+
+    public void eatFood() {
+        for (Item item : inventory) {
+            if (item instanceof Food) {
+                Food food = (Food) item;
+                System.out.println("You ate " + food.getName() + ". It will sustain you for " + food.getNutrition() + " turns.");
+                inventory.remove(food);
+                return;
+            }
+        }
+        System.out.println("You have no food left!");
+    }
+
+
+    public void faint(int turns) {
+        isFainted = true;
+        faintTurnsLeft = turns;
+    }
+
+    public void reduceFaintTime() {
+        if (isFainted) {
+            faintTurnsLeft--;
+            if (faintTurnsLeft <= 0) {
+                isFainted = false;
+            }
+        }
+    }
+
+    public boolean isFainted() {
+        return isFainted;
+    }
+
 }

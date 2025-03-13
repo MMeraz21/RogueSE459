@@ -33,9 +33,14 @@ public class App {
                 if (key == 'Q') {
                     System.out.println("\nExiting...");
                     break;
+                } else if (key == 'E') {
+                    world.getPlayer().eatFood();
+                }else{
+                    world.movePlayer(reader, key);
+
                 }
 
-                world.movePlayer(reader, key);
+                //world.movePlayer(reader, key);
                 System.out.println(); // important for formatting
             }
         } catch (IOException e) {
