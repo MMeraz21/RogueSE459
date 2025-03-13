@@ -1,7 +1,10 @@
 package com.group2.rogue.player;
 
 import com.group2.rogue.items.Item;
+import com.group2.rogue.items.Weapon;
 import com.group2.rogue.worldgeneration.RogueLevel;
+import com.group2.rogue.items.Armor;
+import com.group2.rogue.items.Food;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,11 +26,19 @@ public class Player {
     private int experience = 0;
     private int experienceToNextLevel = 10;
 
+    private Weapon weapon;
+    private Armor equippedArmor;
+
+    // private int foodSupply = 10;
+    private boolean isFainted = false;
+    private int faintTurnsLeft = 0;
+
     // Player inventory
     private List<Item> inventory = new ArrayList<>();
     private static final int MAX_INVENTORY_SIZE = 23;
 
     public Player(RogueLevel dungeon) {
+        initializeInventory();
         this.dungeonMap = dungeon.getMap();
         int[] startingRoom = dungeon.getStartingRoom();
 
@@ -36,6 +47,20 @@ public class Player {
             this.y = startingRoom[1];
         }
     }
+
+    private void initializeInventory() {
+        inventory.add(new Food("Ration", 1000));
+
+        Armor startingArmor = new Armor("Leather", 8);
+        inventory.add(startingArmor);
+        equippedArmor = startingArmor;
+
+        Weapon startingWeapon = new Weapon("Mace", 2, 4, false, null);
+        inventory.add(startingWeapon);
+        weapon = startingWeapon;
+        
+    }
+
 
     public void movePlayer(char direction) {
         int newX = x, newY = y;
@@ -105,11 +130,11 @@ public class Player {
     }
 
     public int getStrength() {
-        return strength;
+        return strength + weapon.getDamage();
     }
 
     public int getArmor() {
-        return armor;
+        return armor + equippedArmor.getArmorClass();
     }
 
     public void setLevel(RogueLevel dungeon) {
@@ -132,4 +157,84 @@ public class Player {
     public int levelIndexUp() {
         return level++;
     }
+
+    public void eatFood() {
+        for (Item item : inventory) {
+            if (item instanceof Food) {
+                Food food = (Food) item;
+                System.out.println("You ate " + food.getName() + ". It will sustain you for " + food.getNutrition() + " turns.");
+                inventory.remove(food);
+                return;
+            }
+        }
+        System.out.println("You have no food left!");
+    }
+
+
+    public void faint(int turns) {
+        isFainted = true;
+        faintTurnsLeft = turns;
+    }
+
+    public void reduceFaintTime() {
+        if (isFainted) {
+            faintTurnsLeft--;
+            if (faintTurnsLeft <= 0) {
+                isFainted = false;
+            }
+        }
+    }
+
+    public boolean isFainted() {
+        return isFainted;
+    }
+
+    public void cycleWeapons() {
+        List<Weapon> weapons = new ArrayList<>();
+        for (Item item : inventory) {
+            if (item instanceof Weapon) {
+                weapons.add((Weapon) item);
+            }
+        }
+
+        if(weapons.isEmpty()) {
+            System.out.println("You have no weapons to equip.");
+            return;
+        }
+
+        //Find current weapon index
+        int currentWeaponIndex = weapons.indexOf(weapon);
+        int nextWeaponIndex = (currentWeaponIndex + 1) % weapons.size();
+        weapon = weapons.get(nextWeaponIndex);
+        System.out.println("You equipped: " + weapon);
+    }
+
+    public void cycleArmor() {
+        List<Armor> armors = new ArrayList<>();
+        for (Item item : inventory) {
+            if (item instanceof Armor) {
+                armors.add((Armor) item);
+            }
+        }
+
+        if(armors.isEmpty()) {
+            System.out.println("You have no armor to equip.");
+            return;
+        }
+
+        //Find current armor index
+        int currentArmorIndex = armors.indexOf(equippedArmor);
+        int nextArmorIndex = (currentArmorIndex + 1) % armors.size();
+        equippedArmor = armors.get(nextArmorIndex);
+        System.out.println("You equipped: " + equippedArmor);
+    }
+
+    public Weapon getWeapon() {
+        return weapon;
+    }
+
+    public Armor getEquippedArmor() {
+        return equippedArmor;
+    }
+
 }

@@ -22,7 +22,12 @@ public class World {
     private RogueLevel currLevel;  //points to the current level
     private Player player;
 
-    // private String message = " ";
+    private int turn = 0;
+    private int nextMealTurn;
+    private static final int MEAL_INTERVAL = 1300;
+    private static final int MEAL_VARIANCE = 130;
+    private static final int STARVATION_LIMIT = 850;
+
     private List <String> messages = new ArrayList<>();
 
     public void generateWorld() {
@@ -33,11 +38,25 @@ public class World {
         currLevel = levels.get(0);
     }
 
+    public Player getPlayer() {
+        return player;
+    }
+
     public void placePlayer() {
         player = new Player(currLevel);
+        initializeHunger();
     }
 
     public void movePlayer(NonBlockingReader reader, char direction) {
+        if (player.isFainted()) {
+            player.reduceFaintTime();
+            messages.add("You are unconscious and cannot move.");
+            return;
+        }
+
+        turn++;
+        updateHunger();
+
         int oldX = player.getX();
         int oldY = player.getY();
     
@@ -146,29 +165,6 @@ public class World {
         }
         return null;
     }
-
-    // private void initiateCombat(NonBlockingReader reader, Monster monster) {        
-    //     if (monster.isMean()) {  // monster attacks first
-    //         monsterAttack(monster);
-    //     }
-        
-    //     while (player.getHits() > 0) {  // loop until someone dies
-    //         playerAttack(monster);  // player starts
-            
-    //         if (monster.getHealth() <= 0) {  // onster death check
-    //             handleMonsterDeath(monster);
-    //             break;
-    //         }
-            
-    //         monsterAttack(monster);  //monsters turn
-            
-    //         if (player.getHits() <= 0) {  // player death check
-    //             // System.out.println("You have been slain by " + monster.getName() + "!");
-    //             message = "You have been slain by " + monster.getName() + "!";
-    //             break;
-    //         }
-    //     }
-    // }
 
     private void initiateCombat(NonBlockingReader reader, Monster monster) {
         playerAttack(monster);
@@ -281,6 +277,27 @@ public class World {
         messages.clear();
     }
 
+    private void initializeHunger() {
+        nextMealTurn = turn + MEAL_INTERVAL + new Random().nextInt(2 * MEAL_VARIANCE) - MEAL_VARIANCE;
+    }
+
+    private void updateHunger() {
+        int turnsSinceLastMeal = turn - nextMealTurn;
+
+        if (turnsSinceLastMeal == -300) {
+            messages.add("You are starting to get hungry.");
+        } else if (turnsSinceLastMeal == -150) {
+            messages.add("You are starting to feel weak.");
+        } else if (turnsSinceLastMeal >= 0 && turnsSinceLastMeal < STARVATION_LIMIT) {
+            messages.add("You feel very weak. You faint from the lack of food.");
+            player.faint(rollDice(1, 8) + 4);
+        } else if (turnsSinceLastMeal >= STARVATION_LIMIT) {
+            messages.add("You have died from starvation.");
+            //implement death later
+            //player.die();
+        }
+    }
+
 
 
     public void displayWorld() {
@@ -311,13 +328,13 @@ public class World {
                     Item item = currLevel.getItemAt(x, y);
                     if (item != null) {
                         if (item instanceof Food) {
-                            System.out.print('F'); // Food
+                            System.out.print('f'); // Food
                         } else if (item instanceof Weapon) {
-                            System.out.print('W'); // Weapon
+                            System.out.print(')'); // Weapon
                         } else if (item instanceof Armor) {
-                            System.out.print('A'); // Armor
+                            System.out.print(']'); // Armor
                         } else if (item instanceof Gold) {
-                            System.out.print('G'); // Gold
+                            System.out.print('$'); // Gold
                         }
                     } else if (x == playerX && y == playerY) {
                         System.out.print('@'); // Player

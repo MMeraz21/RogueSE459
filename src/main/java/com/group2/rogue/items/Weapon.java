@@ -1,5 +1,7 @@
 package com.group2.rogue.items;
 
+import java.util.Random;
+
 public class Weapon extends Item {
     private int minDamage;
     private int maxDamage;
@@ -20,6 +22,11 @@ public class Weapon extends Item {
 
     public int getMaxDamage() {
         return maxDamage;
+    }
+
+    public int getDamage() {
+        Random rand = new Random();
+        return rand.nextInt((maxDamage - minDamage) + 1) + minDamage;
     }
 
     public boolean isRanged() {
