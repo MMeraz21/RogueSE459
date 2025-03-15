@@ -13,6 +13,7 @@ import com.group2.rogue.items.Armor;
 import com.group2.rogue.items.Food;
 import com.group2.rogue.items.Gold;
 import com.group2.rogue.items.Item;
+import com.group2.rogue.items.Potion;
 import com.group2.rogue.items.Weapon;
 import com.group2.rogue.monsters.Monster;
 import com.group2.rogue.player.Player;
@@ -357,6 +358,8 @@ public class World {
                             System.out.print(']'); // Armor
                         } else if (item instanceof Gold) {
                             System.out.print('$'); // Gold
+                        }else if (item instanceof Potion) {
+                            System.out.print('!'); // Potion
                         }
                     } else if (x == playerX && y == playerY) {
                         System.out.print('@'); // Player

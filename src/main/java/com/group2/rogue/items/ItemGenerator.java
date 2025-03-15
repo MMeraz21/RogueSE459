@@ -60,4 +60,8 @@ public class ItemGenerator {
         int amount = minGold + random.nextInt(maxGold - minGold + 1);
         return new Gold(amount);
     }
+
+    public static Potion generatePotion() {
+        return new Potion(PotionType.values()[random.nextInt(PotionType.values().length)]);
+    }
 }

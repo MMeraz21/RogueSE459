@@ -283,7 +283,7 @@ public class RogueLevel {
             if (random.nextInt(5) == 0) { // 1 in 5 chance for an item
                 int x = center[0];
                 int y = center[1];
-                int itemType = random.nextInt(3); // 0: Weapon, 1: Armor, 2: Food
+                int itemType = random.nextInt(4); // 0: Weapon, 1: Armor, 2: Food,  3: Potion
                 switch (itemType) {
                     case 0:
                         Weapon weapon = ItemGenerator.generateWeapon();
@@ -297,6 +297,10 @@ public class RogueLevel {
                         Food food = ItemGenerator.generateFood();
                         items.put(new Position(x, y), food); // Use Position as key
                         break;
+                    case 3:
+                        Potion potion = ItemGenerator.generatePotion();
+                        items.put(new Position(x, y), potion); // Use Position as key
+                        break;   
                 }
             }
         }
