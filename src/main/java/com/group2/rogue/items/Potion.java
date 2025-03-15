@@ -1,5 +1,6 @@
 package com.group2.rogue.items;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
@@ -18,9 +19,9 @@ public class Potion extends Item {
     private static final Random random = new Random();
     private static final String[] assignedColors = new String[PotionType.values().length];
 
-        static {
+    static {
         // Shuffle and assign unique colors to each potion type
-        List<String> shuffledColors = COLORS.stream().toList();
+        List<String> shuffledColors = new ArrayList<>(COLORS);  // Create a mutable list
         Collections.shuffle(shuffledColors, random);
         for (int i = 0; i < PotionType.values().length; i++) {
             assignedColors[i] = shuffledColors.get(i);
