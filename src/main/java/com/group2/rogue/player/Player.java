@@ -273,15 +273,53 @@ public class Player {
     public void removeBlindness() {
         isBlind = false;
     }
+    public boolean isBlind() {
+        return isBlind;
+    }
+
+    public void updateBlindness() {
+        if (isBlind) {
+            blindTurnsLeft--;
+            if (blindTurnsLeft <= 0) {
+                isBlind = false;
+            }
+        }
+    }
 
     public void setConfused(int turns) {
         isConfused = true;
         confusedTurnsLeft = turns;
     }
 
+    public boolean isConfused() {
+        return isConfused;
+    }
+
+    public void updateConfusion() {
+        if (isConfused) {
+            confusedTurnsLeft--;
+            if (confusedTurnsLeft <= 0) {
+                isConfused = false;
+            }
+        }
+    }
+
     public void setParalyzed(int turns) {
         isParalyzed = true;
         paralysisTurnsLeft = turns;
+    }
+
+    public boolean isParalyzed() {
+        return isParalyzed;
+    }
+
+    public void updateParalysis() {
+        if (isParalyzed) {
+            paralysisTurnsLeft--;
+            if (paralysisTurnsLeft <= 0) {
+                isParalyzed = false;
+            }
+        }
     }
 
     public void showMessage(String message) {

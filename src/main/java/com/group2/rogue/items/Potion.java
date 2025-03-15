@@ -43,31 +43,31 @@ public class Potion extends Item {
 
     public void applyEffect(Player player) {
         switch (type) {
-            case BLINDNESS:
+            case BLINDNESS:  //done, makes player miss attacks for x turns
                 player.setBlind(20 + random.nextInt(5) - random.nextInt(5));
                 player.showMessage("A cloak of darkness falls around you.");
                 break;
-            case CONFUSION:
+            case CONFUSION:   //done, plaeyr moves in a random direction for x turns
                 player.setConfused(random.nextInt(8) + 20);
                 player.showMessage("Wait, what's going on? Huh? What? Who?");
                 break;
-            case EXTRA_HEALING:
+            case EXTRA_HEALING:  // done, just affects player stats
                 int healAmount = player.getPlayerLevel() * random.nextInt(8);
                 player.heal(healAmount);
                 player.removeBlindness();
                 player.showMessage("You begin to feel much better.");
                 break;
-            case GAIN_STRENGTH:
+            case GAIN_STRENGTH:  // done, just affects player stats
                 player.increaseStrength(1);
                 player.showMessage("You feel stronger. What bulging muscles!");
                 break;
-            case HEALING:
+            case HEALING:  // done, just affects player stats
                 healAmount = player.getPlayerLevel() * random.nextInt(4);
                 player.heal(healAmount);
                 player.removeBlindness();
                 player.showMessage("You begin to feel better.");
                 break;
-            case PARALYSIS:
+            case PARALYSIS:  // done, player can't move for x turns
                 player.setParalyzed(random.nextInt(4) + 1);
                 player.showMessage("You can't move.");
                 break;
@@ -75,11 +75,11 @@ public class Potion extends Item {
                 player.decreaseStrength(random.nextInt(3) + 1);
                 player.showMessage("You feel very sick.");
                 break;
-            case RAISE_LEVEL:
+            case RAISE_LEVEL:  // done, just affects player stats
                 player.levelUp();
                 player.showMessage("You suddenly feel much more skillful.");
                 break;
-            case RESTORE_STRENGTH:
+            case RESTORE_STRENGTH:  // done, just affects player stats
                 player.restoreStrength();
                 player.showMessage("Hey, this tastes great. It makes you feel warm all over.");
                 break;

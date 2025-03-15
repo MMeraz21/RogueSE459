@@ -54,8 +54,20 @@ public class World {
             return;
         }
 
+        if(player.isParalyzed()) {
+            messages.add("You are paralyzed and cannot move.");
+            player.updateParalysis();
+            return;
+        }
+
         turn++;
         updateHunger();
+
+        if (player.isConfused()) {  // player is confused, move in random direction (overrides user input)
+            char[] directions = {'W', 'A', 'S', 'D'};
+            direction = directions[new Random().nextInt(directions.length)];
+            messages.add("You feel dizzy and move unpredictably!");
+        }
 
         int oldX = player.getX();
         int oldY = player.getY();
@@ -101,6 +113,8 @@ public class World {
                 moveToPreviousLevel();
             }
         }
+
+        player.updateConfusion();
     }
 
     private boolean isWalkable(int x, int y) {
@@ -201,6 +215,14 @@ public class World {
     }
 
     private void playerAttack(Monster monster) {
+        if (player.isBlind()) {  //blindness state
+            if (Math.random() < 0.5) {  // 50% chance to miss when blind
+                messages.add("You missed your attack due to blindness!");
+                player.updateBlindness();
+                return;
+            }
+        }
+
         int roll = rollDice(10, 20);  //changed min for pres
         int strengthMod = calculateStrengthAttackModifier(player.getStrength());
         int totalRoll = roll + player.getPlayerLevel() + strengthMod;
