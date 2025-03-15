@@ -28,7 +28,7 @@ public class World {
     private static final int MEAL_VARIANCE = 130;
     private static final int STARVATION_LIMIT = 850;
 
-    private List <String> messages = new ArrayList<>();
+    public static List <String> messages = new ArrayList<>();
 
     public void generateWorld() {
         levels = new ArrayList<>();   // world has 9 levels

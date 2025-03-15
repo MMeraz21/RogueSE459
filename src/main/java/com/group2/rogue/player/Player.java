@@ -5,6 +5,7 @@ import com.group2.rogue.items.Weapon;
 import com.group2.rogue.worldgeneration.RogueLevel;
 import com.group2.rogue.items.Armor;
 import com.group2.rogue.items.Food;
+import com.group2.rogue.worldgeneration.World;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +37,14 @@ public class Player {
     // Player inventory
     private List<Item> inventory = new ArrayList<>();
     private static final int MAX_INVENTORY_SIZE = 23;
+
+    // Variables for potion effects
+    private boolean isBlind = false;
+    private int blindTurnsLeft = 0;
+    private boolean isConfused = false;
+    private int confusedTurnsLeft = 0;
+    private boolean isParalyzed = false;
+    private int paralysisTurnsLeft = 0;
 
     public Player(RogueLevel dungeon) {
         initializeInventory();
@@ -116,7 +125,7 @@ public class Player {
         }
     }
 
-    private void levelUp() {
+    public void levelUp() {
         playerLevel++;
         experienceToNextLevel *= 2;
     }
@@ -202,7 +211,6 @@ public class Player {
             return;
         }
 
-        //Find current weapon index
         int currentWeaponIndex = weapons.indexOf(weapon);
         int nextWeaponIndex = (currentWeaponIndex + 1) % weapons.size();
         weapon = weapons.get(nextWeaponIndex);
@@ -222,7 +230,6 @@ public class Player {
             return;
         }
 
-        //Find current armor index
         int currentArmorIndex = armors.indexOf(equippedArmor);
         int nextArmorIndex = (currentArmorIndex + 1) % armors.size();
         equippedArmor = armors.get(nextArmorIndex);
@@ -237,4 +244,42 @@ public class Player {
         return equippedArmor;
     }
 
+    public void heal(int amount) {
+        hits = Math.min(hits + amount, hits);
+    }
+
+    public void increaseStrength(int amount) {
+        strength += amount;
+    }
+
+    public void decreaseStrength(int amount) {
+        strength -= amount;
+    }
+
+    public void restoreStrength() {
+        strength = 16;
+    }
+
+    public void setBlind(int turns) {
+        isBlind = true;
+        blindTurnsLeft = turns;
+    }
+
+    public void removeBlindness() {
+        isBlind = false;
+    }
+
+    public void setConfused(int turns) {
+        isConfused = true;
+        confusedTurnsLeft = turns;
+    }
+
+    public void setParalyzed(int turns) {
+        isParalyzed = true;
+        paralysisTurnsLeft = turns;
+    }
+
+    public void showMessage(String message) {
+        World.messages.add(message);
+    }
 }
