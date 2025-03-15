@@ -33,6 +33,8 @@ public class App {
                 if (key == 'Q') {
                     System.out.println("\nExiting...");
                     break;
+                } else if  (key == 'P') {
+                    world.getPlayer().drinkPotion(reader);
                 } else if (key == 'E') {
                     world.getPlayer().eatFood();
                 } else if (key == 'R') {

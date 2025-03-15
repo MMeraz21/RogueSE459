@@ -6,9 +6,14 @@ import com.group2.rogue.worldgeneration.RogueLevel;
 import com.group2.rogue.items.Armor;
 import com.group2.rogue.items.Food;
 import com.group2.rogue.worldgeneration.World;
+import com.group2.rogue.items.Potion;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.jline.utils.NonBlocking;
+import org.jline.utils.NonBlockingReader;
 
 public class Player {
     private int x, y;
@@ -281,5 +286,57 @@ public class Player {
 
     public void showMessage(String message) {
         World.messages.add(message);
+    }
+
+    public void drinkPotion(NonBlockingReader reader) {
+        List<Potion> potions = new ArrayList<>();
+        for (Item item : inventory) {
+            if (item instanceof Potion) {
+                potions.add((Potion)item);
+            }
+        }
+
+        if(potions.isEmpty()) {
+            System.out.println("You have no potions to drink.");
+            return;
+        }
+
+        System.out.println("Choose a potion to drink:");
+        for (int i = 0; i < potions.size(); i++) {
+            Potion potion = potions.get(i);
+            System.out.println((i + 1) + ". " + potion);
+        }
+
+        int choice = -1;
+        System.out.print("> ");
+        try {
+            int input = reader.read();
+            if (input == -1) {
+                System.out.println("Invalid input.");
+                return;
+            }
+
+            char inputChar = (char) input;
+            if (Character.isDigit(inputChar)) {
+                choice = Character.getNumericValue(inputChar) - 1;
+            }
+
+        } catch (IOException e) {
+            System.out.println("Error reading input: " + e.getMessage());
+            return;
+        }
+
+        if (choice < 0 || choice >= potions.size()) {
+            System.out.println("Invalid choice.");
+            return;
+        }
+
+        Potion chosenPotion = potions.get(choice);
+        chosenPotion.applyEffect(this);
+
+        inventory.remove(chosenPotion);
+        System.out.println("You drank the " + chosenPotion + " and it has been consumed.");
+
+
     }
 }
