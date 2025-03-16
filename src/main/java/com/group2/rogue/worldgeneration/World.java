@@ -44,11 +44,17 @@ public class World {
     }
 
     public void placePlayer() {
-        player = new Player(currLevel);
+        player = new Player(currLevel, this);
         initializeHunger();
     }
 
     public void movePlayer(NonBlockingReader reader, char direction) {
+        if(player.isSleeping()) {
+            messages.add("You are asleep and cannot move.");
+            player.updateSleep();
+            return;
+        }
+
         if (player.isFainted()) {
             player.reduceFaintTime();
             messages.add("You are unconscious and cannot move.");
@@ -118,6 +124,34 @@ public class World {
         player.updateConfusion();
     }
 
+    public List<Monster> getMonstersWithinRange(int x, int y, int range) {
+        List<Monster> monsters = new ArrayList<>();
+        for (Monster monster : currLevel.getMonsters()) {
+            int monsterX = monster.getX();
+            int monsterY = monster.getY();
+            if (Math.abs(monsterX - x) <= range && Math.abs(monsterY - y) <= range) {
+                monsters.add(monster);
+            }
+        }
+        return monsters;
+    }
+
+    public int[] findRandomEmptyPosition() {
+        char[][] map = currLevel.getMap();
+        Random random = new Random();
+        int x, y;
+        do {
+            x = random.nextInt(map[0].length);
+            y = random.nextInt(map.length);
+        } while (!isWalkable(x, y));
+        return new int[] {x, y};
+    }
+
+    public int getDungeonLevel() {
+        //return the current levels index in the levels list
+        return levels.indexOf(currLevel);
+    }
+
     private boolean isWalkable(int x, int y) {
         return player.isWalkable(x, y);
     }
@@ -179,6 +213,10 @@ public class World {
             }
         }
         return null;
+    }
+
+    public void addMonster(Monster monster) {
+        currLevel.addMonster(monster);
     }
 
     private void initiateCombat(NonBlockingReader reader, Monster monster) {
@@ -246,6 +284,14 @@ public class World {
     }
 
     private void monsterAttack(Monster monster) {
+        if (monster.isConfused()) {
+            if (Math.random() < 0.5) {  // 50% chance to miss when confused
+                messages.add("The " + monster.getName() + " misses you due to confusion!");
+                monster.updateConfusion();
+                return;
+            }
+        }
+
         int roll = rollDice(1, 20);
         int totalRoll = roll + monster.getLevel();
         

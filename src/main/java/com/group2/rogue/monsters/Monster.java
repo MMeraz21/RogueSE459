@@ -19,6 +19,10 @@ public class Monster {
     private int minDamage;
     private int maxDamage;
     private int x, y;
+    private boolean isConfused = false;
+    private int confusionTurns = 0;
+    private boolean held = false;
+    private int holdTurns = 0;
     private static final Random random = new Random();
 
     public Monster(char symbol, String name, int level, int armor, int health, int experience,
@@ -92,4 +96,40 @@ public class Monster {
     public int getExperience() {
         return experience;
     }
+
+    public boolean isConfused() {
+        return isConfused;
+    }
+
+    public int getConfusionTurns() {
+        return confusionTurns;
+    }
+
+    public void updateConfusion() {
+        confusionTurns--;
+        if (confusionTurns == 0) {
+            isConfused = false;
+        }
+    }
+
+    public void setConfused(boolean confused) {
+        isConfused = confused;
+    }
+
+    public void setConfusionTurns(int turns) {
+        confusionTurns = turns;
+    }
+
+    public boolean isHeld() {
+        return held;
+    }
+
+    public void setHeld(boolean held) {
+        this.held = held;
+    }
+
+    public void setHoldTurns(int turns) {
+        holdTurns = turns;
+    }
+
 }

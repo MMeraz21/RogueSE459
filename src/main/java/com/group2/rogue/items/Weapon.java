@@ -37,6 +37,11 @@ public class Weapon extends Item {
         return requiredWeapon;
     }
 
+    public void setDamage(int minDamage, int maxDamage) {
+        this.minDamage = minDamage;
+        this.maxDamage = maxDamage;
+    }
+
     @Override
     public String toString() {
         return getName() + " (Damage: " + minDamage + "-" + maxDamage + ")";

@@ -64,4 +64,8 @@ public class ItemGenerator {
     public static Potion generatePotion() {
         return new Potion(PotionType.values()[random.nextInt(PotionType.values().length)]);
     }
+
+    public static Scroll generateScroll() {
+        return new Scroll(ScrollType.values()[random.nextInt(ScrollType.values().length)]);
+    }
 }

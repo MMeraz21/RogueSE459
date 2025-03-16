@@ -267,6 +267,10 @@ public class RogueLevel {
         }
     }
 
+    public void addMonster(Monster monster) {
+        monsters.add(monster);
+    }
+
     private void placeItems() {
         // Place gold in rooms (1 in 3 chance)
         for (int[] center : roomCenters) {

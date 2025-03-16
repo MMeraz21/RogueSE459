@@ -1,12 +1,15 @@
 package com.group2.rogue.player;
 
 import com.group2.rogue.items.Item;
+import com.group2.rogue.items.ItemGenerator;
 import com.group2.rogue.items.Weapon;
 import com.group2.rogue.worldgeneration.RogueLevel;
 import com.group2.rogue.items.Armor;
 import com.group2.rogue.items.Food;
 import com.group2.rogue.worldgeneration.World;
 import com.group2.rogue.items.Potion;
+import com.group2.rogue.items.Scroll;
+import com.group2.rogue.items.ScrollType;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -50,10 +53,15 @@ public class Player {
     private int confusedTurnsLeft = 0;
     private boolean isParalyzed = false;
     private int paralysisTurnsLeft = 0;
+    private boolean isSleeping = false;
+    private int sleepTurnsLeft = 0;
 
-    public Player(RogueLevel dungeon) {
+    private World world;
+
+    public Player(RogueLevel dungeon, World world) {
         initializeInventory();
         this.dungeonMap = dungeon.getMap();
+        this.world = world;
         int[] startingRoom = dungeon.getStartingRoom();
 
         if (startingRoom != null) {
@@ -72,6 +80,10 @@ public class Player {
         Weapon startingWeapon = new Weapon("Mace", 2, 4, false, null);
         inventory.add(startingWeapon);
         weapon = startingWeapon;
+
+        //add two scrolls to inventory
+        inventory.add(new Scroll(ScrollType.TELEPORT));
+        inventory.add(new Scroll(ScrollType.SLEEP));
         
     }
 
@@ -322,6 +334,33 @@ public class Player {
         }
     }
 
+    public void setSleeping(boolean bool) {
+        isSleeping = bool;
+    }
+
+    public boolean isSleeping() {
+        return isSleeping;
+    }
+
+    public void updateSleep() {
+        if (isSleeping) {
+            sleepTurnsLeft--;
+            if (sleepTurnsLeft <= 0) {
+                isSleeping = false;
+            }
+        }
+    }
+
+    public void setSleepTurns(int turns) {
+        sleepTurnsLeft = turns;
+    }
+
+    public int getSleepTurns() {
+        return sleepTurnsLeft;
+    }
+
+
+
     public void showMessage(String message) {
         World.messages.add(message);
     }
@@ -379,6 +418,61 @@ public class Player {
     }
 
     public void useScroll(NonBlockingReader reader) {
+        List<Item> scrolls = new ArrayList<>();
+        for (Item item : inventory) {
+            if (item instanceof Scroll) {
+                scrolls.add(item);
+            }
+        }
         
+        if (scrolls.isEmpty()) {
+            System.out.println("You don't have any scrolls.");
+            return;
+        }
+        
+        // Show available scrolls
+        System.out.println("\nAvailable Scrolls:");
+        for (int i = 0; i < scrolls.size(); i++) {
+            System.out.println((i + 1) + ": " + scrolls.get(i).getName());
+        }
+        
+        System.out.println("Select a scroll to use (1-" + scrolls.size() + ") or 0 to cancel: ");
+        
+        try {
+            int selection = -1;
+            while (selection < 0 || selection > scrolls.size()) {
+                int input = reader.read();
+                if (input == -1) continue;
+                
+                char key = (char) input;
+                if (Character.isDigit(key)) {
+                    selection = Character.getNumericValue(key);
+                    
+                    if (selection < 0 || selection > scrolls.size()) {
+                        System.out.println("Invalid selection. Try again (0-" + scrolls.size() + "): ");
+                    }
+                }
+            }
+            
+            if (selection == 0) {
+                System.out.println("Cancelled.");
+                return;
+            }
+            
+            // Get selected scroll
+            Scroll selectedScroll = (Scroll) scrolls.get(selection - 1);
+            
+            // Apply scroll effect
+            System.out.println("\nYou read the " + selectedScroll.getName() + ".");
+            selectedScroll.applyEffect(this, world, reader);
+            
+            // Remove scroll from inventory after use
+            inventory.remove(selectedScroll);
+            
+        } catch (IOException e) {
+            System.out.println("Error reading input.");
+        }
     }
+
+
 }
