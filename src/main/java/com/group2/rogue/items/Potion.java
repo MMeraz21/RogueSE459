@@ -20,8 +20,7 @@ public class Potion extends Item {
     private static final String[] assignedColors = new String[PotionType.values().length];
 
     static {
-        // Shuffle and assign unique colors to each potion type
-        List<String> shuffledColors = new ArrayList<>(COLORS);  // Create a mutable list
+        List<String> shuffledColors = new ArrayList<>(COLORS);  
         Collections.shuffle(shuffledColors, random);
         for (int i = 0; i < PotionType.values().length; i++) {
             assignedColors[i] = shuffledColors.get(i);

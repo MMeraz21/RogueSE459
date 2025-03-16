@@ -41,6 +41,8 @@ public class App {
                     world.getPlayer().cycleWeapons();
                 } else if (key == 'T') {
                     world.getPlayer().cycleArmor();
+                } else if (key == 'X') {
+                    world.getPlayer().useScroll(reader);
                 } else {
                     world.movePlayer(reader, key);
                 }

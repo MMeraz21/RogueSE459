@@ -377,4 +377,8 @@ public class Player {
 
 
     }
+
+    public void useScroll(NonBlockingReader reader) {
+        
+    }
 }
