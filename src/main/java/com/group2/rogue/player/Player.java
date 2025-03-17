@@ -6,8 +6,12 @@ import com.group2.rogue.items.Weapon;
 import com.group2.rogue.worldgeneration.RogueLevel;
 import com.group2.rogue.items.Armor;
 import com.group2.rogue.items.Food;
+import com.group2.rogue.items.Gold;
 import com.group2.rogue.worldgeneration.World;
 import com.group2.rogue.items.Potion;
+import com.group2.rogue.items.PotionType;
+import com.group2.rogue.items.Ring;
+import com.group2.rogue.items.RingType;
 import com.group2.rogue.items.Scroll;
 import com.group2.rogue.items.ScrollType;
 import com.group2.rogue.items.Stick;
@@ -59,6 +63,9 @@ public class Player {
     private boolean isSleeping = false;
     private int sleepTurnsLeft = 0;
 
+    private Ring ring1;
+    private Ring ring2;
+
     private World world;
 
     public Player(RogueLevel dungeon, World world) {
@@ -91,6 +98,14 @@ public class Player {
         //add two sticks to inventory
         inventory.add(new Stick(StickType.POLYMORPH, StickMaterial.ALUMINUM));
         inventory.add(new Stick(StickType.DRAIN_LIFE, StickMaterial.BANYAN));
+
+        //add two rings to inventory
+        inventory.add(new Ring(RingType.TELEPORTATION));
+        inventory.add(new Ring(RingType.INCREASE_DAMAGE));
+
+        //add two potions to inventory
+        inventory.add(new Potion(PotionType.PARALYSIS));
+        inventory.add(new Potion(PotionType.RAISE_LEVEL));
         
     }
 
@@ -122,6 +137,14 @@ public class Player {
 
     public void pickUpItem(Item item) {
         if (inventory.size() < MAX_INVENTORY_SIZE) {
+
+            if (item instanceof Gold) {
+                Gold goldItem = (Gold) item;
+                gold += goldItem.getAmount();
+                System.out.println("You picked up " + goldItem.getAmount() + " gold.");
+                return;
+            }
+            
             inventory.add(item);
             System.out.println("You picked up: " + item);
         } else {
@@ -131,11 +154,18 @@ public class Player {
 
     public String getStats() {
         return String.format("Level: %d  Gold: %d  Hp: %d(%d)  Str: %d  Armor: %d  Exp: %d/%d",
-            level, gold, hits, hits, strength, armor, playerLevel, experience);
+            level, gold, hits, hits, strength, getArmor(), playerLevel, experience);
     }
 
     public int getX() { return x; }
     public int getY() { return y; }
+
+    public Ring getRing1() {
+        return ring1;
+    }
+    public Ring getRing2() {
+        return ring2;
+    }
 
     public void takeDamage(int damage) {
         hits = Math.max(0, hits - damage);
@@ -277,6 +307,10 @@ public class Player {
     }
 
     public void decreaseStrength(int amount) {
+        if(this.ring1.getRingType() == RingType.SUSTAIN_STRENGTH || this.ring2.getRingType() == RingType.SUSTAIN_STRENGTH) {
+            System.out.println("Your ring protects your strength from being lowered");
+            return;
+        }
         strength -= amount;
     }
 
@@ -531,6 +565,85 @@ public class Player {
         } catch (IOException e) {
             System.out.println("Error reading input.");
         }
+    }
+
+    public void useRing(NonBlockingReader reader) {
+        List<Item> rings = new ArrayList<>();
+        for (Item item : inventory) {
+            if (item instanceof Ring) {
+                rings.add(item);
+            }
+        }
+        
+        if (rings.isEmpty()) {
+            System.out.println("You don't have any rings.");
+            return;
+        }
+        
+        System.out.println("\nAvailable Rings:");
+        for (int i = 0; i < rings.size(); i++) {
+            System.out.println((i + 1) + ": " + rings.get(i).getName());
+        }
+        
+        System.out.println("Select a ring to use (1-" + rings.size() + ") or 0 to cancel: ");
+        
+        try {
+            int selection = -1;
+            while (selection < 0 || selection > rings.size()) {
+                int input = reader.read();
+                if (input == -1) continue;
+                
+                char key = (char) input;
+                if (Character.isDigit(key)) {
+                    selection = Character.getNumericValue(key);
+                    
+                    if (selection < 0 || selection > rings.size()) {
+                        System.out.println("Invalid selection. Try again (0-" + rings.size() + "): ");
+                    }
+                }
+            }
+            
+            if (selection == 0) {
+                System.out.println("Cancelled.");
+                return;
+            }
+            
+            Ring selectedRing = (Ring) rings.get(selection - 1);
+            
+            System.out.println("\nYou put on the " + selectedRing.getName() + ".");
+            equipRing(selectedRing);
+
+            if (selectedRing.getRingType() == RingType.TELEPORTATION) {
+                teleportPlayer(this, world);
+            }
+            //selectedRing.applyEffect(this, world, reader);
+            
+            inventory.remove(selectedRing);
+            
+        } catch (IOException e) {
+            System.out.println("Error reading input.");
+        }
+    }
+
+    public void equipRing(Ring ring) {
+        if (ring1 == null) {
+            ring1 = ring;
+            System.out.println("You equipped: " + ring);
+        } else if (ring2 == null) {
+            ring2 = ring;
+            System.out.println("You equipped: " + ring);
+        } else {
+            System.out.println("You already have two rings equipped. Remove one to equip another.");
+        }
+    }
+
+    private void teleportPlayer(Player player, World world) {
+        int[] randomLocation = world.findRandomEmptyPosition();
+        int newX = randomLocation[0];
+        int newY = randomLocation[1];
+
+        player.setPosition(newX, newY);
+        System.out.println("You find yourself in a different location");
     }
 
 }
