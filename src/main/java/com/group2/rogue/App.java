@@ -43,6 +43,8 @@ public class App {
                     world.getPlayer().cycleArmor();
                 } else if (key == 'X') {
                     world.getPlayer().useScroll(reader);
+                }else if (key == 'Z') {
+                    world.getPlayer().useStick(reader); 
                 } else {
                     world.movePlayer(reader, key);
                 }

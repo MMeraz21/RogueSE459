@@ -10,6 +10,9 @@ import com.group2.rogue.worldgeneration.World;
 import com.group2.rogue.items.Potion;
 import com.group2.rogue.items.Scroll;
 import com.group2.rogue.items.ScrollType;
+import com.group2.rogue.items.Stick;
+import com.group2.rogue.items.StickMaterial;
+import com.group2.rogue.items.StickType;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -84,6 +87,10 @@ public class Player {
         //add two scrolls to inventory
         inventory.add(new Scroll(ScrollType.TELEPORT));
         inventory.add(new Scroll(ScrollType.SLEEP));
+
+        //add two sticks to inventory
+        inventory.add(new Stick(StickType.POLYMORPH, StickMaterial.ALUMINUM));
+        inventory.add(new Stick(StickType.DRAIN_LIFE, StickMaterial.BANYAN));
         
     }
 
@@ -430,7 +437,6 @@ public class Player {
             return;
         }
         
-        // Show available scrolls
         System.out.println("\nAvailable Scrolls:");
         for (int i = 0; i < scrolls.size(); i++) {
             System.out.println((i + 1) + ": " + scrolls.get(i).getName());
@@ -459,14 +465,11 @@ public class Player {
                 return;
             }
             
-            // Get selected scroll
             Scroll selectedScroll = (Scroll) scrolls.get(selection - 1);
             
-            // Apply scroll effect
             System.out.println("\nYou read the " + selectedScroll.getName() + ".");
             selectedScroll.applyEffect(this, world, reader);
             
-            // Remove scroll from inventory after use
             inventory.remove(selectedScroll);
             
         } catch (IOException e) {
@@ -474,5 +477,60 @@ public class Player {
         }
     }
 
+
+    public void useStick(NonBlockingReader reader) {
+        List<Item> sticks = new ArrayList<>();
+        for (Item item : inventory) {
+            if (item instanceof Stick) {
+                sticks.add(item);
+            }
+        }
+        
+        if (sticks.isEmpty()) {
+            System.out.println("You don't have any sticks.");
+            return;
+        }
+        
+        System.out.println("\nAvailable Sticks:");
+        for (int i = 0; i < sticks.size(); i++) {
+            System.out.println((i + 1) + ": " + sticks.get(i).getName());
+        }
+        
+        System.out.println("Select a stick to use (1-" + sticks.size() + ") or 0 to cancel: ");
+        
+        try {
+            int selection = -1;
+            while (selection < 0 || selection > sticks.size()) {
+                int input = reader.read();
+                if (input == -1) continue;
+                
+                char key = (char) input;
+                if (Character.isDigit(key)) {
+                    selection = Character.getNumericValue(key);
+                    
+                    if (selection < 0 || selection > sticks.size()) {
+                        System.out.println("Invalid selection. Try again (0-" + sticks.size() + "): ");
+                    }
+                }
+            }
+            
+            if (selection == 0) {
+                System.out.println("Cancelled.");
+                return;
+            }
+            
+            Stick selectedStick = (Stick) sticks.get(selection - 1);
+            
+            System.out.println("\nYou zapped the " + selectedStick.getName() + ".");
+            selectedStick.zap(this, world, reader);
+
+            if (selectedStick.getCharges() == 0) {
+                inventory.remove(selectedStick);
+            }
+            
+        } catch (IOException e) {
+            System.out.println("Error reading input.");
+        }
+    }
 
 }

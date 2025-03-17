@@ -147,6 +147,10 @@ public class World {
         return new int[] {x, y};
     }
 
+    public void removeMonster(Monster monster) {
+        currLevel.removeMonster(monster);
+    }
+
     public int getDungeonLevel() {
         //return the current levels index in the levels list
         return levels.indexOf(currLevel);
@@ -217,6 +221,10 @@ public class World {
 
     public void addMonster(Monster monster) {
         currLevel.addMonster(monster);
+    }
+
+    public List<Monster> getAllMonsters() {
+        return currLevel.getMonsters();
     }
 
     private void initiateCombat(NonBlockingReader reader, Monster monster) {
@@ -320,6 +328,36 @@ public class World {
         messages.add(message);
         player.addExperience(monster.getExperience());
         currLevel.removeMonster(monster);
+    }
+
+    public Monster getFirstMonsterInDirection(int startX, int startY, int directionX, int directionY) {
+        int dx = Integer.compare(directionX, startX);
+        int dy = Integer.compare(directionY, startY);
+        
+        int x = startX;
+        int y = startY;
+        int maxDistance = 10; 
+        
+        for (int i = 0; i < maxDistance; i++) {
+            x += dx;
+            y += dy;
+            
+            if (x < 0 || x >= currLevel.getMap().length || y < 0 || y >= currLevel.getMap()[0].length) {  //check if pos is out of bounds
+                break;
+            }
+            
+            if (currLevel.getMap()[y][x] == '#' || currLevel.getMap()[y][x] == '+') {  //check for wall
+                break;
+            }
+            
+            for (Monster monster : currLevel.getMonsters()) {
+                if (monster.getX() == x && monster.getY() == y) {
+                    return monster;
+                }
+            }
+        }
+        
+        return null;
     }
 
     private int calculateStrengthAttackModifier(int strength) {
