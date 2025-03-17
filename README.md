@@ -32,3 +32,19 @@ git push -u origin feature/example-feature
   git checkout main
   git pull origin main
   ```
+
+
+## 🎮 Playing the Game  
+
+### 🕹 Movement  
+- Move around the world using the **WASD** keys.  
+- Pressing a **WASD** key into a monster will initiate combat.  
+- Combat is turn-based, with each combatant taking a turn to attempt a hit.  
+
+### 🔥 Commands  
+- **E** - Eat food from your inventory (helps satisfy hunger).  
+- **R** - Cycle through weapons in your inventory (equip the next one).  
+- **T** - Cycle through armor in your inventory (equip the next one).  
+- **X** - Use a **scroll** from your inventory.  
+- **Z** - Use a **stick** from your inventory.  
+- **O** - Equip a **ring** (rings with effects are applied automatically).  
