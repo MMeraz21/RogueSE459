@@ -285,14 +285,15 @@ public class World {
         
         if (totalRoll >= toHit) {  // successful hit
             int ringBonus = 0;
-            if(player.getRing1().getRingType() == RingType.INCREASE_DAMAGE  || player.getRing2().getRingType() == RingType.INCREASE_DAMAGE) {
-                //random number between 0 and 2
+            if ((player.getRing1() != null && player.getRing1().getRingType() == RingType.INCREASE_DAMAGE) ||
+            (player.getRing2() != null && player.getRing2().getRingType() == RingType.INCREASE_DAMAGE)) {
                 ringBonus = random.nextInt(3);
             }
+        
 
             int strengthBonus = 0;
-            if(player.getRing1().getRingType() == RingType.ADD_STRENGTH || player.getRing2().getRingType() == RingType.ADD_STRENGTH) {
-                //random number between 0 and 2
+            if ((player.getRing1() != null && player.getRing1().getRingType() == RingType.ADD_STRENGTH) ||
+            (player.getRing2() != null && player.getRing2().getRingType() == RingType.ADD_STRENGTH)) {
                 strengthBonus = random.nextInt(3);
             }
 
@@ -318,20 +319,21 @@ public class World {
             }
         }
 
-        if(player.getRing1().getRingType() == RingType.STEALTH || player.getRing2().getRingType() == RingType.STEALTH) {
-            //random number between 0 and 2
+        if ((player.getRing1() != null && player.getRing1().getRingType() == RingType.STEALTH) ||
+        (player.getRing2() != null && player.getRing2().getRingType() == RingType.STEALTH)) {
             if (Math.random() < 0.5) {
                 messages.add("The " + monster.getName() + " misses you due to stealth!");
                 return;
-            }
         }
+    }
 
 
         int damageResistance = 0;
-        if (player.getRing1().getRingType() == RingType.PROTECTION || player.getRing2().getRingType() == RingType.PROTECTION) {
-            //random number between 0 and 2
+        if ((player.getRing1() != null && player.getRing1().getRingType() == RingType.PROTECTION) ||
+        (player.getRing2() != null && player.getRing2().getRingType() == RingType.PROTECTION)) {
             damageResistance = random.nextInt(3);
         }
+        
         int roll = rollDice(1, 20);
         int totalRoll = roll + monster.getLevel();
         
