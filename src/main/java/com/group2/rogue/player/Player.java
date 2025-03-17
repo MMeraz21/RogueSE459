@@ -106,6 +106,11 @@ public class Player {
         //add two potions to inventory
         inventory.add(new Potion(PotionType.PARALYSIS));
         inventory.add(new Potion(PotionType.RAISE_LEVEL));
+
+        //add an extra armor and weapon
+        inventory.add(new Armor("Chain Mail", 5));
+        inventory.add(new Weapon("Two-Handed Sword", 4, 4, false, null));
+        
         
     }
 
