@@ -12,6 +12,10 @@ public class Armor extends Item {
         return armorClass;
     }
 
+    public void setArmorClass(int armorClass) {
+        this.armorClass = armorClass;
+    }
+
     @Override
     public String toString() {
         return getName() + " (Armor Class: " + armorClass + ")";

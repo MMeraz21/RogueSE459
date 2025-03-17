@@ -13,6 +13,11 @@ import com.group2.rogue.items.Armor;
 import com.group2.rogue.items.Food;
 import com.group2.rogue.items.Gold;
 import com.group2.rogue.items.Item;
+import com.group2.rogue.items.Potion;
+import com.group2.rogue.items.Ring;
+import com.group2.rogue.items.RingType;
+import com.group2.rogue.items.Scroll;
+import com.group2.rogue.items.Stick;
 import com.group2.rogue.items.Weapon;
 import com.group2.rogue.monsters.Monster;
 import com.group2.rogue.player.Player;
@@ -28,7 +33,9 @@ public class World {
     private static final int MEAL_VARIANCE = 130;
     private static final int STARVATION_LIMIT = 850;
 
-    private List <String> messages = new ArrayList<>();
+    private Random random = new Random();
+
+    public static List <String> messages = new ArrayList<>();
 
     public void generateWorld() {
         levels = new ArrayList<>();   // world has 9 levels
@@ -43,19 +50,37 @@ public class World {
     }
 
     public void placePlayer() {
-        player = new Player(currLevel);
+        player = new Player(currLevel, this);
         initializeHunger();
     }
 
     public void movePlayer(NonBlockingReader reader, char direction) {
+        if(player.isSleeping()) {
+            messages.add("You are asleep and cannot move.");
+            player.updateSleep();
+            return;
+        }
+
         if (player.isFainted()) {
             player.reduceFaintTime();
             messages.add("You are unconscious and cannot move.");
             return;
         }
 
+        if(player.isParalyzed()) {
+            messages.add("You are paralyzed and cannot move.");
+            player.updateParalysis();
+            return;
+        }
+
         turn++;
         updateHunger();
+
+        if (player.isConfused()) {  // player is confused, move in random direction (overrides user input)
+            char[] directions = {'W', 'A', 'S', 'D'};
+            direction = directions[new Random().nextInt(directions.length)];
+            messages.add("You feel dizzy and move unpredictably!");
+        }
 
         int oldX = player.getX();
         int oldY = player.getY();
@@ -101,6 +126,40 @@ public class World {
                 moveToPreviousLevel();
             }
         }
+
+        player.updateConfusion();
+    }
+
+    public List<Monster> getMonstersWithinRange(int x, int y, int range) {
+        List<Monster> monsters = new ArrayList<>();
+        for (Monster monster : currLevel.getMonsters()) {
+            int monsterX = monster.getX();
+            int monsterY = monster.getY();
+            if (Math.abs(monsterX - x) <= range && Math.abs(monsterY - y) <= range) {
+                monsters.add(monster);
+            }
+        }
+        return monsters;
+    }
+
+    public int[] findRandomEmptyPosition() {
+        char[][] map = currLevel.getMap();
+        Random random = new Random();
+        int x, y;
+        do {
+            x = random.nextInt(map[0].length);
+            y = random.nextInt(map.length);
+        } while (!isWalkable(x, y));
+        return new int[] {x, y};
+    }
+
+    public void removeMonster(Monster monster) {
+        currLevel.removeMonster(monster);
+    }
+
+    public int getDungeonLevel() {
+        //return the current levels index in the levels list
+        return levels.indexOf(currLevel);
     }
 
     private boolean isWalkable(int x, int y) {
@@ -166,6 +225,14 @@ public class World {
         return null;
     }
 
+    public void addMonster(Monster monster) {
+        currLevel.addMonster(monster);
+    }
+
+    public List<Monster> getAllMonsters() {
+        return currLevel.getMonsters();
+    }
+
     private void initiateCombat(NonBlockingReader reader, Monster monster) {
         playerAttack(monster);
         displayWorld();
@@ -201,6 +268,14 @@ public class World {
     }
 
     private void playerAttack(Monster monster) {
+        if (player.isBlind()) {  //blindness state
+            if (Math.random() < 0.5) {  // 50% chance to miss when blind
+                messages.add("You missed your attack due to blindness!");
+                player.updateBlindness();
+                return;
+            }
+        }
+
         int roll = rollDice(10, 20);  //changed min for pres
         int strengthMod = calculateStrengthAttackModifier(player.getStrength());
         int totalRoll = roll + player.getPlayerLevel() + strengthMod;
@@ -209,9 +284,21 @@ public class World {
         int toHit = 20 - player.getPlayerLevel() - monster.getArmor();
         
         if (totalRoll >= toHit) {  // successful hit
+            int ringBonus = 0;
+            if(player.getRing1().getRingType() == RingType.INCREASE_DAMAGE  || player.getRing2().getRingType() == RingType.INCREASE_DAMAGE) {
+                //random number between 0 and 2
+                ringBonus = random.nextInt(3);
+            }
+
+            int strengthBonus = 0;
+            if(player.getRing1().getRingType() == RingType.ADD_STRENGTH || player.getRing2().getRingType() == RingType.ADD_STRENGTH) {
+                //random number between 0 and 2
+                strengthBonus = random.nextInt(3);
+            }
+
             int damageBonus = calculateStrengthDamageModifier(player.getStrength());
             int damage = Math.max(1, damageBonus + rollDice(8, 10)); // we haven't added weapons yet, MAKE SURE TO CHANGE THIS, THIS IS FOR DEMO PURPOSES
-            monster.takeDamage(damage);
+            monster.takeDamage(damage + ringBonus + strengthBonus);
             // System.out.println("You hit the " + monster.getName() + " for " + damage + " damage!");
             String message = "You hit the " + monster.getName() + " for " + damage + " damage!";
             messages.add(message);
@@ -223,6 +310,28 @@ public class World {
     }
 
     private void monsterAttack(Monster monster) {
+        if (monster.isConfused()) {
+            if (Math.random() < 0.5) {  // 50% chance to miss when confused
+                messages.add("The " + monster.getName() + " misses you due to confusion!");
+                monster.updateConfusion();
+                return;
+            }
+        }
+
+        if(player.getRing1().getRingType() == RingType.STEALTH || player.getRing2().getRingType() == RingType.STEALTH) {
+            //random number between 0 and 2
+            if (Math.random() < 0.5) {
+                messages.add("The " + monster.getName() + " misses you due to stealth!");
+                return;
+            }
+        }
+
+
+        int damageResistance = 0;
+        if (player.getRing1().getRingType() == RingType.PROTECTION || player.getRing2().getRingType() == RingType.PROTECTION) {
+            //random number between 0 and 2
+            damageResistance = random.nextInt(3);
+        }
         int roll = rollDice(1, 20);
         int totalRoll = roll + monster.getLevel();
         
@@ -230,7 +339,7 @@ public class World {
         
         if (totalRoll >= toHit) {
             int damage = rollDice(monster.getMinDamage(), monster.getMaxDamage());
-            player.takeDamage(damage);
+            player.takeDamage(damage - damageResistance);
             //System.out.println("The " + monster.getName() + " hits you for " + damage + " damage!");
             String message = "The " + monster.getName() + " hits you for " + damage + " damage!";
             messages.add(message);
@@ -251,6 +360,39 @@ public class World {
         messages.add(message);
         player.addExperience(monster.getExperience());
         currLevel.removeMonster(monster);
+    }
+
+    public Monster getFirstMonsterInDirection(int startX, int startY, int directionX, int directionY) {
+        int dx = Integer.compare(directionX - startX, 0);
+        int dy = Integer.compare(directionY - startY, 0);
+        
+        
+        int x = startX;
+        int y = startY;
+        int maxDistance = 10; 
+        
+        for (int i = 0; i < maxDistance; i++) {
+            x += dx;
+            y += dy;
+            
+            if (y < 0 || y >= currLevel.getMap().length || x < 0 || x >= currLevel.getMap()[0].length) {  //check if pos is oob
+                break;
+            }
+            
+            
+            if (currLevel.getMap()[y][x] == '#' || currLevel.getMap()[y][x] == '+') {  //check for wall
+                System.out.println("Wall");
+                break;
+            }
+            
+            for (Monster monster : currLevel.getMonsters()) {
+                if (monster.getX() == x && monster.getY() == y) {
+                    return monster;
+                }
+            }
+        }
+        
+        return null;
     }
 
     private int calculateStrengthAttackModifier(int strength) {
@@ -335,6 +477,14 @@ public class World {
                             System.out.print(']'); // Armor
                         } else if (item instanceof Gold) {
                             System.out.print('$'); // Gold
+                        }else if (item instanceof Potion) {
+                            System.out.print('!'); // Potion
+                        } else if (item instanceof Ring) {
+                            System.out.print('='); // Ring
+                        } else if (item instanceof Scroll) {
+                            System.out.print('?'); // Scroll
+                        } else if (item instanceof Stick) {
+                            System.out.print('/'); // Default item
                         }
                     } else if (x == playerX && y == playerY) {
                         System.out.print('@'); // Player

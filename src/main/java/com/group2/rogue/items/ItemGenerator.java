@@ -60,4 +60,21 @@ public class ItemGenerator {
         int amount = minGold + random.nextInt(maxGold - minGold + 1);
         return new Gold(amount);
     }
+
+    public static Potion generatePotion() {
+        return new Potion(PotionType.values()[random.nextInt(PotionType.values().length)]);
+    }
+
+    public static Scroll generateScroll() {
+        return new Scroll(ScrollType.values()[random.nextInt(ScrollType.values().length)]);
+    }
+
+    public static Stick generateStick() {
+        return new Stick(StickType.values()[random.nextInt(StickType.values().length)], StickMaterial.values()[random.nextInt(StickMaterial.values().length)]);
+    }
+
+    public static Ring generateRing() {
+        return new Ring(RingType.values()[random.nextInt(RingType.values().length)]);
+    }
+
 }

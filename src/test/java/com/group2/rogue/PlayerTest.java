@@ -1,6 +1,7 @@
 package com.group2.rogue;
 
 import com.group2.rogue.worldgeneration.RogueLevel;
+import com.group2.rogue.worldgeneration.World;
 import com.group2.rogue.player.Player;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,8 +14,9 @@ public class PlayerTest {
 
     @BeforeEach
     void setUp() {
+        World world = new World();
         dungeon = new RogueLevel(0);
-        player = new Player(dungeon);
+        player = new Player(dungeon, world);
         map = dungeon.getMap();
     }
 

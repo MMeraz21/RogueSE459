@@ -33,12 +33,20 @@ public class App {
                 if (key == 'Q') {
                     System.out.println("\nExiting...");
                     break;
+                } else if  (key == 'P') {
+                    world.getPlayer().drinkPotion(reader);
                 } else if (key == 'E') {
                     world.getPlayer().eatFood();
                 } else if (key == 'R') {
                     world.getPlayer().cycleWeapons();
                 } else if (key == 'T') {
                     world.getPlayer().cycleArmor();
+                } else if (key == 'X') {
+                    world.getPlayer().useScroll(reader);
+                } else if (key == 'Z') {
+                    world.getPlayer().useStick(reader); 
+                } else if (key == 'O') {
+                    world.getPlayer().useRing(reader);
                 } else {
                     world.movePlayer(reader, key);
                 }
