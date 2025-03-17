@@ -48,3 +48,4 @@ git push -u origin feature/example-feature
 - **X** - Use a **scroll** from your inventory.  
 - **Z** - Use a **stick** from your inventory.  
 - **O** - Equip a **ring** (rings with effects are applied automatically).  
+- **P** - Use a **potion** from your inventory
